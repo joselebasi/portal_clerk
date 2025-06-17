@@ -1,0 +1,20 @@
+---
+import SiteLayout from "@layouts/SiteLayout.astro"
+const {orgrole} = Astro.locals;
+// If the user is not logged in, redirect them to the login page
+console.log("orgrole", orgrole);
+if (orgrole === "org:admin") {
+  return Astro.redirect("/dashboard/menu");
+}
+---
+<SiteLayout>
+	{orgrole === "none" && (
+        <section class="flex-grow flex-col items-center justify-center">
+            <h1>Section 1 {orgrole}</h1>
+            <p>This is a simple example of using Clerk with Astro.</p>
+            <p>To get started, check out the <a href="https://clerk.dev/docs/quickstart/astro">Clerk documentation</a>.</p>
+            <p>For more information about Astro, visit the <a href="https://astro.build">Astro website</a>.</p>
+            <p>For more information about Clerk, visit the <a href="https://clerk.dev">Clerk website</a>.</p>
+        </section>
+    )}
+</SiteLayout>

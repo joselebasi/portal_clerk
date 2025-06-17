@@ -1,0 +1,141 @@
+---
+---
+
+<form id="thresholdForm" class="bg-white p-3 mb-8">
+  <div class="mb-4">
+    <label for="organization" class="block text-gray-700 font-medium mb-2">Threshold repositories BO</label>
+    <input
+      type="text"
+      id="organization"
+      name="organization"
+      placeholder="e.g., microsoft"
+      class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+      required
+    />
+  </div>
+  <button
+    type="submit"
+    class="bg-gray-700 text-white py-2 px-6 rounded-md hover:bg-gray-600 transition-colors"
+  >
+    Fetch Repositories
+  </button>
+</form>
+
+<div id="results" class="bg-white rounded-lg shadow-md hidden">
+  <h2 class="text-2xl font-bold">Repositories</h2>
+  <div id="loading" class="text-center py-4 hidden">
+    <p>Loading repositories...</p>
+  </div>
+  <div id="repos-container"></div>
+</div>
+
+<script>
+  document.addEventListener("astro:page-load", () => {
+
+    const form = document.getElementById('thresholdForm') as HTMLFormElement;
+    const resultsDiv = document.getElementById('results') as HTMLDivElement;
+    const loadingDiv = document.getElementById('loading') as HTMLDivElement;
+    const reposContainer = document.getElementById('repos-container') as HTMLDivElement;
+
+    if (!form) return; // Evita errores si el formulario no está presente
+
+    // Asegúrate de no duplicar eventos
+    form.removeEventListener('submit', handleFormSubmit);
+    form.addEventListener('submit', handleFormSubmit);
+
+    async function handleFormSubmit(e: Event) {
+      e.preventDefault();
+
+      const organization = (document.getElementById('organization') as HTMLInputElement).value.trim();
+
+      if (!organization) return;
+
+      // Mostrar estado de carga
+      resultsDiv.classList.remove('hidden');
+      loadingDiv.classList.remove('hidden');
+      reposContainer.innerHTML = '';
+
+      try {
+        const response = await fetch('/api/services_repos', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ organization }),
+        });
+
+        const data = await response.json();
+
+        // Ocultar estado de carga
+        loadingDiv.classList.add('hidden');
+
+        if (data.error) {
+          reposContainer.innerHTML = `<p class="text-red-600">${data.error}</p>`;
+          return;
+        }
+
+        if (data.repositories.length === 0) {
+          reposContainer.innerHTML = '<p>No repositories found for this organization.</p>';
+          return;
+        }
+
+        // Mostrar repositorios
+        // Crear la tabla
+        const table = document.createElement("table");
+
+        // Crear una fila
+        const row = document.createElement("tr");
+        const cell = document.createElement("td");
+        cell.textContent = "Nombre";
+        row.appendChild(cell);
+        const cell2 = document.createElement("td");
+        cell2.textContent = "limit_sca_critical";
+        row.appendChild(cell2);
+        const cell3 = document.createElement("td");
+        cell3.textContent = "limit_sast_critical";
+        row.appendChild(cell3);
+        const cell4 = document.createElement("td");
+        cell4.textContent = "limit_sca_high";
+        row.appendChild(cell4);
+        const cell5 = document.createElement("td");
+        cell5.textContent = "limit_sast_high";
+        row.appendChild(cell5);
+        
+        // Agregar la fila a la tabla
+        table.appendChild(row);
+
+        data.repositories.forEach((repo: any) => {
+          // Crear una fila
+          const row = document.createElement("tr");
+          const cell = document.createElement("td");
+          cell.textContent = repo.name;
+          row.appendChild(cell);
+          const cell2 = document.createElement("td");
+          cell2.textContent = repo.limit_sca_critical;
+          row.appendChild(cell2);
+          const cell3 = document.createElement("td");
+          cell3.textContent = repo.limit_sast_critical;
+          row.appendChild(cell3);
+          const cell4 = document.createElement("td");
+          cell4.textContent = repo.limit_sca_high;
+          row.appendChild(cell4);
+          const cell5 = document.createElement("td");
+          cell5.textContent = repo.limit_sast_critical;
+          row.appendChild(cell5);
+          // Agregar la fila a la tabla
+          table.appendChild(row);
+        });
+
+        reposContainer.appendChild(table);
+
+      } catch (error) {
+        loadingDiv.classList.add('hidden');
+        reposContainer.innerHTML = '<p class="text-red-600">An error occurred while fetching repositories.</p>';
+        console.error('Error:', error);
+      }
+    }
+
+  });
+    
+  
+</script>

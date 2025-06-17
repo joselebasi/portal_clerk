@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+@theme{
+    --color-primary: rgb(243, 107, 22); 
+}
+
+body {
+    font-family: "Twinkle Star", cursive;
+}
