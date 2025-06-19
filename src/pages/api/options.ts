@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro';
 
 type Option = { id: string; label: string };
 
-export const get: APIRoute = async () => {
+export const GET: APIRoute = async () => {
   const options: Option[] = [
     { id: '1', label: 'Opción 1' },
     { id: '2', label: 'Opción 2' },

@@ -3,12 +3,28 @@ import Aside from "@components/Aside.astro"
 import SiteLayout from "@layouts/SiteLayout.astro"
 ---
 <SiteLayout>
-    <section class="flex-grow">
-        <div class="flex h-full">
-			<aside class="w-1/4 h-full">
-			    <Aside/>
-			</aside> 
-			<main class="w-3/4">main</main>
-		</div>		
-    </section>
+	<section>
+		<div class="flex">
+			<button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+				<a href="/dashboard/menu">Menu</a>
+		</div>
+		<div id="response-container">
+            <!-- Aquí se pintará la respuesta -->
+        </div>
+
+
+	</section>
+	<script>
+    const response = await fetch('/api/options');
+    const data = await response.json();
+    console.log("response", data);
+    // Mandar respuesta al contenedor
+    const responseContainer = document.getElementById('response-container');
+    if (responseContainer) {
+        responseContainer.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+    } else {
+        console.error("No se encontró el contenedor de respuesta");
+    }
+</script>
+	
 </SiteLayout>

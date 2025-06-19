@@ -4,6 +4,7 @@ import ClientRouter from 'astro/components/ClientRouter.astro';
 import '../styles/global.css';
 import { SignedIn, SignedOut, UserButton } from "@clerk/astro/components";
 import Footer from '@components/Footer.astro';
+import { Image } from 'astro:assets';
 ---
 
 <html lang="es">
@@ -15,8 +16,9 @@ import Footer from '@components/Footer.astro';
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
   <body class="flex flex-col min-h-screen">
-    <header class="p-4 bg-gray-800 text-white container mx-auto flex items-center justify-between">
-      <h1>OXXOGH-DEVSECOPS</h1>
+    <header class="px-7 bg-gray-500 text-white container mx-auto flex items-center justify-between">
+  
+      <Image src="/logo_BO.png" alt="logo backoffices" width="80" height="80" />
       <nav>
         <SignedOut>
           <a class="text-white font-semibold rounded-full px-4 py-2" href="/sign-in">Sign In</a>
