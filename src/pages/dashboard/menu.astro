@@ -3,28 +3,64 @@ import Aside from "@components/Aside.astro"
 import SiteLayout from "@layouts/SiteLayout.astro"
 ---
 <SiteLayout>
-	<section>
-		<div class="flex">
-			<button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-				<a href="/dashboard/menu">Menu</a>
-		</div>
-		<div id="response-container">
+    <section>
+        <div id="response-container">
             <!-- Aquí se pintará la respuesta -->
         </div>
+    </section>
+    <script type="module">
+        document.addEventListener('DOMContentLoaded', async () => {
+            const responseContainer = document.getElementById('response-container');
+            // Mostrar spinner de carga con Tailwind
+            responseContainer.innerHTML = `
+                <div class="flex justify-center items-center py-8">
+                    <div class="animate-spin rounded-full h-8 w-8 border-4 border-gray-200 border-t-blue-500"></div>
+                </div>
+            `;
+            try {
+                const response = await fetch('/api/pullrequest?org=BUS-BackOffice');
+                const data = await response.json();
 
-
-	</section>
-	<script>
-    const response = await fetch('/api/options');
-    const data = await response.json();
-    console.log("response", data);
-    // Mandar respuesta al contenedor
-    const responseContainer = document.getElementById('response-container');
-    if (responseContainer) {
-        responseContainer.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
-    } else {
-        console.error("No se encontró el contenedor de respuesta");
-    }
-</script>
-	
+                if (Array.isArray(data) && data.length > 0) {
+                    let table = `<div class="overflow-x-auto"><table class="min-w-full border text-xs">
+                        <thead>
+                            <tr>
+                                <th class="border px-2 py-1">Repository</th>
+                                <th class="border px-2 py-1">Author</th>
+                                <th class="border px-2 py-1">Assignees</th>
+                                <th class="border px-2 py-1">Reviewers</th>
+                                <th class="border px-2 py-1">Title</th>
+                                <th class="border px-2 py-1">Description</th>
+                                <th class="border px-2 py-1">Source Branch</th>
+                                <th class="border px-2 py-1">Target Branch</th>
+                                <th class="border px-2 py-1">Days Open</th>
+                                <th class="border px-2 py-1">Link</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.map(pr => `
+                                <tr>
+                                    <td class="border px-2 py-1">${pr.repository}</td>
+                                    <td class="border px-2 py-1">${pr.author}</td>
+                                    <td class="border px-2 py-1">${pr.assignees.join(', ')}</td>
+                                    <td class="border px-2 py-1">${pr.reviewers.join(', ')}</td>
+                                    <td class="border px-2 py-1">${pr.title}</td>
+                                    <td class="border px-2 py-1">${pr.description ? pr.description.substring(0, 50) : ''}</td>
+                                    <td class="border px-2 py-1">${pr.source_branch}</td>
+                                    <td class="border px-2 py-1">${pr.target_branch}</td>
+                                    <td class="border px-2 py-1">${pr.days_open}</td>
+                                    <td class="border px-2 py-1"><a href="${pr.link}" target="_blank" class="text-blue-600 underline">Ver PR</a></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table></div>`;
+                    responseContainer.innerHTML = table;
+                } else {
+                    responseContainer.innerHTML = "<p class='text-center py-4'>No hay pull requests abiertos.</p>";
+                }
+            } catch (err) {
+                responseContainer.innerHTML = "<p class='text-center py-4 text-red-600'>Error al obtener los pull requests.</p>";
+            }
+        });
+    </script>
 </SiteLayout>
